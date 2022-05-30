@@ -1,0 +1,77 @@
+# Originally provided by Octocat on GitHub
+# https://gist.github.com/octocat/9257657
+
+# Project-specific Files #
+##########################
+
+
+# Directories
+#############
+# Assume leading underscore is system, tmp, or otherwise private
+_*/
+
+# Python-related directories
+*.egg*
+*venv*
+.pytest_cache
+.tox/
+__pycache__
+dist/
+.idea/
+
+# Build or release outputs
+_build*/
+_release*/
+bin/
+lib/
+build*/
+release*/
+
+# Compiled source
+#################
+*.a
+*.bin
+*.class
+*.com
+*.dll
+*.elf
+*.exe
+*.hex
+*.o
+*.pyc
+*.so
+*.vhx*
+*.map
+
+# Packages
+##########
+# (it's better to unpack these files and commit the raw source, as git has its
+# own built in compression methods)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.tar.*
+*.zip
+
+# Logs and databases
+####################
+*.log
+
+# System Files
+##############
+._*
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Misc Files
+############
+.vscode/
+.idea/
