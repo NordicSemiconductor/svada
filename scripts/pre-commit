@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Copyright (c) 2022 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# ANSI escape sequence color codes. `echo -e` must be used for them to work in
+# echo statements.
+LRED='\033[1;31m'
+LYELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Hook variables; can be enabled/disabled in "[hooks]" section of .gitconfig
+skipblackformat=$(git config --bool hooks.skipblackformat)
+blackwithdiff=$(git config --bool hooks.blackwithdiff)
+skippylint=$(git config --bool hooks.skippylint)
+pylintrc=$(git config --path hooks.pylintrc)
+
+if [ -z $skipblackformat ]; then
+    skipblackformat=false
+fi
+
+if [ -z $skippylint ]; then
+    skippylint=false
+fi
+
+# Redirect output to stderr.
+exec 1>&2
+
+block=0
+
+# Check staged files only
+for file in $(git diff-index --cached --name-only HEAD); do
+    if [[ "$skipblackformat" =~ "false" ]]; then
+        if [[ -f $file && $file == *.py ]]; then
+            echo "----> Pre-commit: Formatting: Python Black"
+            black -q --check $file
+
+            if [[ $? -ne 0 ]]; then
+                echo -e "${LRED}Not formatted${NC}: $file"
+                black --diff $file
+                echo
+                block=1
+            fi
+        fi
+    fi
+    if [[ "$skippylint" =~ "false" ]]; then
+        if [[ -f $file && $file == *.py ]]; then
+            echo "----> Pre-commit: Linter: Pylint"
+            pylint --score=no --reports=no --rcfile=$pylintrc $file
+
+            if [[ $? -ne 0 ]]; then
+                echo -e "${LRED}Needs linting${NC}: $file"
+                block=1
+            fi
+        fi
+    fi
+done
+
+if [[ $block -eq 1 ]]; then
+    echo
+    echo -e "${LYELLOW}Commit blocked${NC}. Please fix formatting with and re-stage."
+    exit 1
+fi
