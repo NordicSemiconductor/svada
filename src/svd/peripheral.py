@@ -258,9 +258,9 @@ class Register:
     @property
     def raw(self) -> int:
         """The raw numeric value the register contains."""
-        value = 0
+        value = self.reset_value
         for offset, field in self.fields.items():
-            value |= field.raw << offset
+            value = (value & ~field.mask) | ((field.raw << offset) & field.mask)
         return value
 
     def __repr__(self):
@@ -430,6 +430,11 @@ class Field:
     def bit_width(self) -> int:
         """Width of bits in the field."""
         return self._bit_width
+
+    @property
+    def mask(self) -> int:
+        """Bitmask of the field."""
+        return ((1 << self.bit_width) - 1) << self.bit_offset
 
     @property
     def raw(self) -> int:
