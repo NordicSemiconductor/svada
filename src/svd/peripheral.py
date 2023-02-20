@@ -688,7 +688,7 @@ def get_memory_map(element: ET.Element, base_address: int) -> Dict[int, Register
 
     memory_map: Dict[int, Register] = {}
 
-    for address, reg in register_bundles.items():
+    for address, reg in sorted(register_bundles.items(), key=lambda x: x[0]):
         instance = instance_counter[reg.name]
         instance_counter[reg.name] += 1
 
