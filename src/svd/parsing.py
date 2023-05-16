@@ -13,7 +13,7 @@ from .peripheral import Peripheral, Register
 
 def parse_peripheral(
     svd_path: Union[str, Path], peripheral_name: str
-) -> Dict[int, Register]:
+) -> Peripheral:
     """
     Parse an SVD for a specific peripheral and return it as a map of a memory offset and the
     register at that offset.
@@ -23,7 +23,7 @@ def parse_peripheral(
 
     :raise FileNotFoundError: If the SVD file does not exist.
 
-    :return: Mapping of offset:registers for the peripheral.
+    :return: `Peripheral` instance for the given name.
     """
 
     svd_file = Path(svd_path)
