@@ -21,4 +21,11 @@ from .util import (
     to_int,
 )
 
-__version__ = "1.0.1"
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("svada")
+except importlib.metadata.PackageNotFoundError:
+    # Package is not installed
+    import setuptools_scm
+    __version__ = setuptools_scm.get_version(root="../..", relative_to=__file__)
