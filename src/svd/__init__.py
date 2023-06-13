@@ -4,21 +4,49 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from .bindings import (
+    Access,
+    ReadAction,
+    Endian,
+    SauAccess,
+    AddressBlockUsage,
+    Protection,
+    EnumUsage,
+    WriteAction,
+    DataType,
+    CpuName,
+    Cpu,
+    AddressBlock,
+    SauRegion,
+)
+from .errors import (
+    SvdError,
+    SvdParseError,
+    SvdDefinitionError,
+    SvdMemoryError,
+    SvdPathError,
+    SvdIndexError,
+    SvdKeyError,
+)
 from .parsing import (
-    parse_peripheral,
+    parse,
+    Options,
 )
-from .peripheral import (
-    Peripheral,
-    RegisterElement,
-    Register,
+from .path import FEPath, EPath
+from .device import (
+    Array,
     Field,
-    get_memory_map,
-    get_bit_range,
-    get_register_elements,
-)
-from .util import (
-    strip_prefixes_suffixes,
-    to_int,
+    FlatRegister,
+    FlatRegisterUnion,
+    FlatRegisterType,
+    FlatStruct,
+    FlatField,
+    Device,
+    Peripheral,
+    Register,
+    RegisterUnion,
+    RegisterType,
+    Struct,
 )
 
 import importlib.metadata
