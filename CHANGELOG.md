@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Latest](https://github.com/NordicSemiconductor/svada)
 
+## [v2.0.1](https://github.com/NordicSemiconductor/svada/tree/v2.0.1)
+
+### Fixed
+* NCSDK-24490: Specified minimum version requirements for all dependencies.
+
 ## [v2.0.0](https://github.com/NordicSemiconductor/svada/tree/v2.0.0)
 
 This version is a large expansion of svada to support a lot of new features.
