@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Latest](https://github.com/NordicSemiconductor/svada)
 
+## [v2.0.2](https://github.com/NordicSemiconductor/svada/tree/v2.0.2)
+
+### Fixed
+* NCSDK-24532: SVD files are now opened in binary mode instead of defaulting to the locale preferred encoding.
+  This avoids issues that occur when the locale encoding doesn't match the file encoding.
+
 ## [v2.0.1](https://github.com/NordicSemiconductor/svada/tree/v2.0.1)
 
 ### Fixed
