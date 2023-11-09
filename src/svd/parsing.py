@@ -92,7 +92,7 @@ def parse(svd_path: Union[str, Path], options: Options = Options()) -> Device:
         class_lookup = _TwoLevelTagLookup(bindings.BINDINGS)
         xml_parser.set_element_class_lookup(class_lookup)
 
-        with open(svd_file, "r") as f:
+        with open(svd_file, "rb") as f:
             xml_device = objectify.parse(f, parser=xml_parser)
 
         t_parse = (perf_counter_ns() - t_parse_start) / 1_000_000
