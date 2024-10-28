@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Latest](https://github.com/NordicSemiconductor/svada)
 
+## [v2.1.0](https://github.com/NordicSemiconductor/svada/tree/v2.1.0)
+
+### Changed
+
+* NCSDK-29781: Updated package dependencies to enable support for Python 3.13.
+  Consequently, removed support for Python 3.9 and below.
+
 ## [v2.0.2](https://github.com/NordicSemiconductor/svada/tree/v2.0.2)
 
 ### Fixed
