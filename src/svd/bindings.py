@@ -15,7 +15,6 @@ Based on CMSIS-SVD schema v1.3.9.
 
 from __future__ import annotations
 
-import dataclasses as dc
 import enum
 import typing
 from dataclasses import dataclass
@@ -23,7 +22,7 @@ from typing import Iterator, NamedTuple, Optional, Protocol, Sequence, Union
 
 from lxml import objectify
 from lxml.objectify import BoolElement, StringElement
-from typing_extensions import TypeGuard, override
+from typing_extensions import TypeGuard
 
 from ._bindings import (
     SELF_CLASS,

@@ -15,13 +15,9 @@ many of the operations in this module lazily compute the data needed on first ac
 
 from __future__ import annotations
 
-import dataclasses as dc
 import math
-import re
 import typing
 from abc import ABC, abstractmethod
-from collections import defaultdict
-from dataclasses import dataclass
 from functools import cached_property
 from types import MappingProxyType
 from typing import (
@@ -37,7 +33,6 @@ from typing import (
     Literal,
     Mapping,
     NamedTuple,
-    NoReturn,
     Optional,
     Protocol,
     Reversible,
@@ -70,7 +65,6 @@ from .bindings import (
     ReadAction,
     RegisterProperties,
     WriteAction,
-    WriteConstraint,
 )
 from .errors import (
     SvdDefinitionError,
@@ -1421,21 +1415,17 @@ class Field(_Field):
         write to the field.
         """
         if isinstance(new_content, int):
-            val = self._trailing_zero_adjusted(new_content)
-
-            if val not in self.allowed_values:
+            if new_content not in self.allowed_values:
                 raise ValueError(
                     f"{self!r} does not accept"
-                    f" the bit value '{val}' ({hex(val)})."
-                    " Are you sure you have an up to date .svd file?"
+                    f" the bit value '{new_content}' ({hex(new_content)})."
                 )
-            resolved_value = val
+            resolved_value = new_content
         elif isinstance(new_content, str):
             if new_content not in self.enums:
                 raise ValueError(
                     f"{self!r} does not accept"
                     f" the enum '{new_content}'."
-                    " Are you sure you have an up to date .svd file?"
                 )
             resolved_value = self.enums[new_content]
         else:
@@ -1445,6 +1435,16 @@ class Field(_Field):
             )
 
         self._register.set_content(resolved_value << self.bit_offset, self.mask)
+
+    @property
+    def content_enum(self) -> str:
+        """The name of the enum corresponding to the field value."""
+        content = self.content
+        for enum_str, value in self.enums.items():
+            if content == value:
+                return enum_str
+
+        raise LookupError(f"{self!r} content {content} does not correspond to an enum.")
 
     @property
     def modified(self) -> bool:
@@ -1457,36 +1457,6 @@ class Field(_Field):
         the field will accept any value that can fit inside its bit width.
         """
         self._allowed_values = range(2**self.bit_width)
-
-    def _trailing_zero_adjusted(self, content: int) -> int:
-        """
-        Internal method that checks and adjusts a given value for trailing zeroes if it exceeds
-        the bit width of its field. Some values are simplest to encode as a full 32-bit value even
-        though their field is comprised of less than 32 bits, such as an address.
-
-        :param value: A numeric value to check against the field bits
-
-        :return: Field value without any trailing zeroes
-        """
-
-        width_max = 2**self.bit_width
-
-        if content > width_max:
-            max_val = width_max - 1
-            max_val_hex_len = len(f"{max_val:x}")
-            hex_val = f"{content:0{8}x}"  # leading zeros, 8-byte max, in hex
-            trailing = hex_val[max_val_hex_len:]  # Trailing zeros
-
-            if int(trailing, 16) != 0:
-                raise SvdMemoryError(f"Unexpected trailing value: {trailing}")
-
-            cropped = hex_val[:max_val_hex_len]  # value w/o trailing
-            adjusted = int(cropped, 16)
-
-            if adjusted <= max_val:
-                return adjusted
-
-        return content
 
     def __repr__(self) -> str:
         """Short field description."""

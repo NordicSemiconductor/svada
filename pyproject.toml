@@ -13,7 +13,6 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-  "setuptools_scm[toml]>=6.2",
   "lxml~=5.3",
   "numpy~=2.1",
   "typing_extensions>=4.4.0",
@@ -24,17 +23,17 @@ homepage = "https://github.com/nordicsemiconductor/svada"
 repository = "https://github.com/nordicsemiconductor/svada.git"
 
 [build-system]
-requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools]
-package-dir = { svd = "src/svd" }
-include-package-data = true
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.package-data]
-svd = ["py.typed"]
+[tool.hatch.build.targets.sdist]
+packages = ["src/svd"]
 
-[tool.setuptools_scm]
+[tool.hatch.build.targets.wheel]
+packages = ["src/svd"]
 
 [tool.mypy]
 disallow_untyped_defs = true
