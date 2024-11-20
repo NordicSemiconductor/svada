@@ -8,15 +8,12 @@ from __future__ import annotations
 
 from functools import partial
 from typing import (
-    Any,
     Callable,
-    Dict,
     Iterator,
     List,
     Mapping,
     Optional,
     Tuple,
-    Type,
     TypeVar,
     Union,
     overload,
@@ -24,7 +21,7 @@ from typing import (
 
 import numpy as np
 import numpy.ma as ma
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import ArrayLike
 from typing_extensions import Self
 
 from .errors import SvdMemoryError

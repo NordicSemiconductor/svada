@@ -16,11 +16,8 @@ many of the operations in this module lazily compute the data needed on first ac
 from __future__ import annotations
 
 import dataclasses as dc
-import re
 import typing
 from abc import ABC, abstractmethod
-from collections import defaultdict
-from dataclasses import dataclass
 from functools import cached_property
 from types import MappingProxyType
 from typing import (
@@ -36,7 +33,6 @@ from typing import (
     Literal,
     Mapping,
     NamedTuple,
-    NoReturn,
     Optional,
     Protocol,
     Reversible,
@@ -69,7 +65,6 @@ from .bindings import (
     ReadAction,
     RegisterProperties,
     WriteAction,
-    WriteConstraint,
 )
 from .errors import (
     SvdDefinitionError,

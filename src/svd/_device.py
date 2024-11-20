@@ -10,7 +10,6 @@ Various internal functionality used by the device module.
 
 from __future__ import annotations
 
-import functools as ft
 import re
 import typing
 from abc import ABC
