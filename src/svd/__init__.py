@@ -6,6 +6,7 @@
 
 import importlib.metadata
 
+from . import util
 from .bindings import (
     Access,
     ReadAction,
@@ -54,6 +55,7 @@ from .device import (
 __version__ = importlib.metadata.version("svada")
 
 __all__ = [
+    "util",
     "Access",
     "ReadAction",
     "Endian",
