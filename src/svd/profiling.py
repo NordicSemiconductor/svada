@@ -10,7 +10,6 @@ Internal basic profiling functionality.
 
 from __future__ import annotations
 
-import inspect
 import os
 from time import perf_counter_ns
 from typing import (

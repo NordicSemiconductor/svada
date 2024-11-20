@@ -4,10 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from abc import ABC
 from typing import Any, Iterable, Union
 
-from .path import EPath, EPathType, EPathUnion
+from .path import EPathUnion
 
 
 class SvdError(Exception):
