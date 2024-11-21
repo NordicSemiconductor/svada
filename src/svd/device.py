@@ -16,7 +16,6 @@ many of the operations in this module lazily compute the data needed on first ac
 from __future__ import annotations
 
 import dataclasses as dc
-import math
 import re
 import typing
 from abc import ABC, abstractmethod
@@ -1192,7 +1191,7 @@ class Register(_Register[EPath, "Field"]):
         """
         reg_width = self.bit_width
 
-        if new_content > 0 and math.ceil(math.log2(new_content)) > reg_width:
+        if new_content.bit_length() > reg_width:
             raise SvdMemoryError(
                 f"Value {hex(new_content)} is too large for {reg_width}-bit register {self.path}."
             )
