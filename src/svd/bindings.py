@@ -1,8 +1,5 @@
-#
 # Copyright (c) 2023 Nordic Semiconductor ASA
-#
 # SPDX-License-Identifier: Apache-2.0
-#
 
 """
 "Low-level" read-only Python representation of the SVD format that aims to represent the full SVD
