@@ -12,11 +12,9 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from functools import singledispatch
 from itertools import chain
 from typing import (
     Any,
-    Generic,
     Iterable,
     List,
     Optional,

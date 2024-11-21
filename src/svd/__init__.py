@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+import importlib.metadata
+
+from . import util
 from .bindings import (
     Access,
     ReadAction,
@@ -49,11 +52,47 @@ from .device import (
     Struct,
 )
 
-import importlib.metadata
+__version__ = importlib.metadata.version("svada")
 
-try:
-    __version__ = importlib.metadata.version("svada")
-except importlib.metadata.PackageNotFoundError:
-    # Package is not installed
-    import setuptools_scm
-    __version__ = setuptools_scm.get_version(root="../..", relative_to=__file__)
+__all__ = [
+    "util",
+    "Access",
+    "ReadAction",
+    "Endian",
+    "SauAccess",
+    "AddressBlockUsage",
+    "Protection",
+    "EnumUsage",
+    "WriteAction",
+    "DataType",
+    "CpuName",
+    "Cpu",
+    "AddressBlock",
+    "SauRegion",
+    "SvdError",
+    "SvdParseError",
+    "SvdDefinitionError",
+    "SvdMemoryError",
+    "SvdPathError",
+    "SvdIndexError",
+    "SvdKeyError",
+    "parse",
+    "Options",
+    "FEPath",
+    "EPath",
+    "Array",
+    "Field",
+    "FlatRegister",
+    "FlatRegisterUnion",
+    "FlatRegisterType",
+    "FlatStruct",
+    "FlatField",
+    "Device",
+    "Peripheral",
+    "Register",
+    "RegisterUnion",
+    "RegisterType",
+    "Struct",
+]
+
+del importlib.metadata
