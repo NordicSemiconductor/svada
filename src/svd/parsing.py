@@ -46,7 +46,7 @@ class Options:
 
     # Make the addressOffset in cluster elements be relative to the immediate parent
     # element instead of relative to the containing peripheral.
-    parent_relative_cluster_address: bool = False
+    parent_relative_cluster_address: bool = True
 
     # Cluster/register/field elements to remove from the XML document prior to parsing.
     # This can be used to remove outdated/deprecated elements from the device if they cause
