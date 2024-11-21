@@ -17,6 +17,10 @@ dependencies = [
   "numpy~=2.1",
   "typing_extensions>=4.4.0",
 ]
+optional-dependencies = { cli = ["intelhex", "tomlkit"] }
+
+[project.scripts]
+svada = "svd.__main__:cli"
 
 [project.urls]
 homepage = "https://github.com/nordicsemiconductor/svada"
