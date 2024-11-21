@@ -206,9 +206,7 @@ def cmd_content_gen(args: argparse.Namespace) -> None:
     else:
         input_file = sys.stdin.buffer if "b" in input_mode else sys.stdin
 
-    options = svd.Options(
-        parent_relative_cluster_address=True,
-    )
+    options = svd.Options()
     if args.svd_parse_options:
         options = dataclasses.replace(options, **args.svd_parse_options)
 
