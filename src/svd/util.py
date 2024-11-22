@@ -268,10 +268,10 @@ class DeviceBuilder:
                         break
                 else:
                     # TODO: logger?
-                    print(
-                        f"Address 0x{addr_0:08x} does not correspond to any peripheral",
-                        file=sys.stderr,
-                    )
+                    # print(
+                    #     f"Address 0x{addr_0:08x} does not correspond to any peripheral",
+                    #     file=sys.stderr,
+                    # )
                     continue
 
             assert current_periph_regs is not None
@@ -280,12 +280,12 @@ class DeviceBuilder:
                 reg = current_periph_regs[addr_0]
             except KeyError:
                 # TODO: logger?
-                print(
-                    f"Address 0x{addr_0:08x} is within the address range of {current_periph} "
-                    f"[0x{current_periph_range.start:x}-0x{current_periph_range.stop:x}), but "
-                    "does not correspond to any register in the peripheral",
-                    file=sys.stderr,
-                )
+                # print(
+                #     f"Address 0x{addr_0:08x} is within the address range of {current_periph} "
+                #     f"[0x{current_periph_range.start:x}-0x{current_periph_range.stop:x}), but "
+                #     "does not correspond to any register in the peripheral",
+                #     file=sys.stderr,
+                # )
                 continue
 
             reg_len = reg.bit_width // 8
