@@ -47,8 +47,25 @@ from .device import (
 )
 
 import importlib.metadata
+import logging
 
 __version__ = importlib.metadata.version("svada")
+
+
+def _init_logger() -> logging.Logger:
+    formatter = logging.Formatter("{message}", style="{")
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger("svada")
+    logger.setLevel(logging.ERROR)
+    logger.addHandler(handler)
+
+    return logger
+
+
+# logging.Logger instance used for log output from svada
+log = _init_logger()
 
 __all__ = [
     # from bindings
@@ -94,7 +111,6 @@ __all__ = [
     "RegisterType",
     "Struct",
     # other
+    "log",
     "__version__",
 ]
-
-del importlib.metadata
