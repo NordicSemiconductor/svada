@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 import enum
-import logging
 from dataclasses import dataclass
+from functools import cached_property
 from itertools import pairwise
 from typing import Any, Optional
 
@@ -37,11 +37,9 @@ class BuildSelector:
         return True
 
     def is_addr_selected(self, address: int) -> bool:
-        if self.address_range is not None and not (
+        return self.address_range is None or (
             self.address_range[0] <= address <= self.address_range[1]
-        ):
-            return False
-        return True
+        )
 
     def is_reg_selected(self, reg: svd.Register) -> bool:
         if self.address_range is not None:
@@ -51,26 +49,17 @@ class BuildSelector:
             ):
                 return False
 
-        if (
-            self.content_status == BuildSelector.ContentStatus.WRITTEN
-            and not reg.written
-        ):
+        if self.content_status == BuildSelector.ContentStatus.WRITTEN and not reg.written:
             return False
 
-        if (
-            self.content_status == BuildSelector.ContentStatus.MODIFIED
-            and not reg.modified
-        ):
+        if self.content_status == BuildSelector.ContentStatus.MODIFIED and not reg.modified:
             return False
 
         return True
 
     def is_field_selected(self, field: svd.Field) -> bool:
         # svada does not have a way to check written status at this level currently
-        if (
-            self.content_status == BuildSelector.ContentStatus.MODIFIED
-            and not field.modified
-        ):
+        if self.content_status == BuildSelector.ContentStatus.MODIFIED and not field.modified:
             return False
 
         return True
@@ -79,9 +68,7 @@ class BuildSelector:
 class DeviceBuilder:
     """Used to populate peripheral registers and output the register contents in various formats."""
 
-    def __init__(
-        self, device: svd.Device, enforce_svd_constraints: bool = True
-    ) -> None:
+    def __init__(self, device: svd.Device, enforce_svd_constraints: bool = True) -> None:
         self._device = device
         self._enforce_svd_constraints = enforce_svd_constraints
         self._written_peripherals = {}
@@ -98,25 +85,25 @@ class DeviceBuilder:
         """The list of peripherals that have been written to as part of the API calls."""
         return list(self._written_peripherals.values())
 
-    def build_bytes(self, selector: BuildSelector = BuildSelector()) -> bytearray:
+    def build_bytes(
+        self, selector: BuildSelector = BuildSelector(), *, fill_value: int = 0
+    ) -> bytearray:
         """Encode device content as bytes.
 
         :param selector: selected parts of the device.
+        :param fill_value: value used to fill empty address ranges.
         :returns: content bytes.
         """
         memory = self.build_memory(selector)
-        out = bytearray()
+        if not memory:
+            return bytearray()
 
-        for (addr_a, value_a), (addr_b, value_b) in pairwise(memory.items()):
-            if not out:
-                out.append(value_a)
+        start_addr = next(iter(memory))
+        end_addr = next(reversed(memory))
+        out = bytearray([fill_value]) * (end_addr - start_addr + 1)
 
-            num_empty = addr_b - addr_a - 1
-            if num_empty > 0:
-                # TODO: 0 may not always be valid
-                out.extend([0] * num_empty)
-
-            out.append(value_b)
+        for addr, value in memory.items():
+            out[addr - start_addr] = value
 
         return out
 
@@ -129,6 +116,12 @@ class DeviceBuilder:
         memory = {}
 
         for peripheral in self._device.values():
+            if (
+                selector.content_status == BuildSelector.ContentStatus.WRITTEN
+                and peripheral not in self.written_peripherals
+            ):
+                continue
+
             if not selector.is_periph_selected(peripheral):
                 continue
 
@@ -143,16 +136,13 @@ class DeviceBuilder:
 
             memory_iter = peripheral.memory_iter(
                 absolute_addresses=True,
-                written_only=(
-                    selector.content_status == BuildSelector.ContentStatus.WRITTEN
-                ),
+                written_only=(selector.content_status == BuildSelector.ContentStatus.WRITTEN),
             )
 
             for addr, val in memory_iter:
-                if (
-                    periph_modified_filter is not None
-                    and addr not in periph_modified_filter
-                ):
+                if periph_modified_filter is not None and addr not in periph_modified_filter:
+                    continue
+                if not selector.is_addr_selected(addr):
                     continue
                 memory[addr] = val
 
@@ -167,6 +157,12 @@ class DeviceBuilder:
         config = {}
 
         for peripheral in self._device.values():
+            if (
+                selector.content_status == BuildSelector.ContentStatus.WRITTEN
+                and peripheral not in self.written_peripherals
+            ):
+                continue
+
             if not selector.is_periph_selected(peripheral):
                 continue
 
@@ -236,7 +232,6 @@ class DeviceBuilder:
         :param content: content memory map.
         :returns: builder instance.
         """
-        periph_map = self._device_periph_map()
         reg_map = {}
         current_periph = None
         current_periph_range = range(-1, 0)
@@ -251,7 +246,7 @@ class DeviceBuilder:
                 break
 
             if addr_0 not in current_periph_range:
-                for periph_range, periph in periph_map:
+                for periph_range, periph in self._device_periph_map:
                     if addr_0 in periph_range:
                         current_periph = periph
                         current_periph_range = periph_range
@@ -264,9 +259,7 @@ class DeviceBuilder:
                         self._written_peripherals.setdefault(periph_id, periph)
                         break
                 else:
-                    svd.log.warning(
-                        f"Address 0x{addr_0:08x} does not correspond to any peripheral"
-                    )
+                    svd.log.warning(f"Address 0x{addr_0:08x} does not correspond to any peripheral")
                     continue
 
             assert current_periph_regs is not None
@@ -311,8 +304,6 @@ class DeviceBuilder:
         :param content: content dictionary.
         :returns: builder instance.
         """
-        affected_periphs = []
-
         for periph_name, content in config.items():
             peripheral = self._device[periph_name]
             for reg_name, reg_value in content.items():
@@ -320,10 +311,7 @@ class DeviceBuilder:
                     peripheral[reg_name],
                     reg_value,
                 )
-            affected_periphs.append(peripheral)
-
-        for periph in affected_periphs:
-            self._written_peripherals.setdefault(_get_periph_id(periph), periph)
+            self._written_peripherals.setdefault(_get_periph_id(peripheral), peripheral)
 
         return self
 
@@ -338,9 +326,7 @@ class DeviceBuilder:
                     try:
                         index = int(index_str)
                     except ValueError:
-                        raise ValueError(
-                            f"{index_str} is not a valid index for {reg!r}"
-                        )
+                        raise ValueError(f"{index_str} is not a valid index for {reg!r}")
                     self._reg_apply_dict(reg[index], rest)
 
             case (svd.Struct() | svd.Register(), dict()):
@@ -355,10 +341,8 @@ class DeviceBuilder:
             case _:
                 raise ValueError(f"{value} is not a valid value for {reg!r}")
 
+    @cached_property
     def _device_periph_map(self) -> list[tuple[range, svd.Peripheral]]:
-        if self._cached_device_periph_map:
-            return self._cached_device_periph_map
-
         for periph in self._device.values():
             start_addr, end_addr = periph.address_bounds
             self._cached_device_periph_map.append((range(start_addr, end_addr), periph))
@@ -380,7 +364,5 @@ def _get_periph_id(peripheral: svd.Peripheral) -> tuple:
     return peripheral.name, peripheral.base_address
 
 
-def _ranges_overlap_inclusive(
-    a_start: int, a_end: int, b_start: int, b_end: int
-) -> bool:
+def _ranges_overlap_inclusive(a_start: int, a_end: int, b_start: int, b_end: int) -> bool:
     return a_end >= b_start and b_end >= a_start
