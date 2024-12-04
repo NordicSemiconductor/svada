@@ -49,7 +49,6 @@ from .device import (
 
 import importlib.metadata
 import logging
-import typing
 
 __version__ = importlib.metadata.version("svada")
 
@@ -117,8 +116,3 @@ __all__ = [
     "util",
     "__version__",
 ]
-
-if not typing.TYPE_CHECKING:
-    del importlib.metadata
-    del logging
-    del typing
