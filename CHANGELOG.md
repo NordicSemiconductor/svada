@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Latest](https://github.com/NordicSemiconductor/svada)
 
+## [v2.2.0](https://github.com/NordicSemiconductor/svada/tree/v2.2.0)
+
+### Added
+* Added a CLI script called ``svada`` that can be used to generate register content in various formats.
+  See ``svada --help`` for more information.
+* Added a helper for populating and outputting peripheral memory in ``svd.util``.
+* Added public APIs to ``__all__`` to silence linter warnings about private API usage.
+
+### Updated
+* Switched to the hatchling build system.
+* Updated the default options so that ``parent_relative_cluster_offset=True``.
+  While not compliant with the literal reading of the specification, this seems to be the intended way to parse cluster offsets.
+* Removed automatic "trailing zero adjustment" for field content.
+
+### Fixed
+* Fixed a off-by-one error in ``svd.Register.set_content``, which caused incorrect bounds checks for values that were a power of 2.
+
 ## [v2.1.0](https://github.com/NordicSemiconductor/svada/tree/v2.1.0)
 
 ### Changed
