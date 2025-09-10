@@ -1595,6 +1595,13 @@ def _extract_register_descriptions_helper(
 
             size_bytes = reg_props.size // 8
 
+            if (
+                options.autocorrect_dim_increment
+                and dim_props is not None
+                and dim_props.step < size_bytes
+            ):
+                dim_props.step = size_bytes
+
             # Contiguous fill
             if dim_props is None or dim_props.step == size_bytes:
                 length = dim_props.length if dim_props is not None else 1
@@ -1661,11 +1668,14 @@ def _extract_register_descriptions_helper(
 
                 if dim_props is not None and dim_props.length > 1:
                     if dim_props.step < sub_max_address - address_start:
-                        raise SvdDefinitionError(
-                            element,
-                            f"Step of 0x{dim_props.step:x} is less than the size required to "
-                            f"cover all the child elements (0x{sub_max_address - address_start:x})",
-                        )
+                        if options.autocorrect_dim_increment:
+                            dim_props.step = sub_max_address - address_start
+                        else:
+                            raise SvdDefinitionError(
+                                element,
+                                f"Step of 0x{dim_props.step:x} is less than the size required to "
+                                f"cover all the child elements (0x{sub_max_address - address_start:x})",
+                            )
 
                     address_end = address_start + dim_props.step * dim_props.length
 
