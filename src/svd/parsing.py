@@ -45,6 +45,11 @@ class Options:
     # element instead of relative to the containing peripheral.
     parent_relative_cluster_address: bool = True
 
+    # If the dimIncrement of a register or cluster is found to be less than the combined size
+    # of the child elements, automatically increase it to equal the size of the child
+    # elements, instead of exiting with an error.
+    autocorrect_dim_increment: bool = True
+
     # Cluster/register/field elements to remove from the XML document prior to parsing.
     # This can be used to remove outdated/deprecated elements from the device if they cause
     # issues with parsing.

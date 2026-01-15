@@ -326,12 +326,10 @@ class Peripheral(Mapping[str, RegisterUnion]):
         return LazyFixedMapping(keys=self._specs.keys(), factory=self.__getitem__)
 
     @overload
-    def register_iter(self, leaf_only: Literal[True]) -> Iterator[Register]:
-        ...
+    def register_iter(self, leaf_only: Literal[True]) -> Iterator[Register]: ...
 
     @overload
-    def register_iter(self, leaf_only: bool = False) -> Iterator[RegisterUnion]:
-        ...
+    def register_iter(self, leaf_only: bool = False) -> Iterator[RegisterUnion]: ...
 
     @timed_method(max_times=10)
     def register_iter(self, leaf_only: Any = False) -> Any:
@@ -357,14 +355,14 @@ class Peripheral(Mapping[str, RegisterUnion]):
         )
 
     @overload
-    def flat_register_iter(self, leaf_only: Literal[True]) -> Iterator[FlatRegister]:
-        ...
+    def flat_register_iter(
+        self, leaf_only: Literal[True]
+    ) -> Iterator[FlatRegister]: ...
 
     @overload
     def flat_register_iter(
         self, leaf_only: Literal[False]
-    ) -> Iterator[FlatRegisterUnion]:
-        ...
+    ) -> Iterator[FlatRegisterUnion]: ...
 
     @timed_method(max_times=10)
     def flat_register_iter(
@@ -440,12 +438,10 @@ class Peripheral(Mapping[str, RegisterUnion]):
         return len(self._specs)
 
     @overload
-    def _get_or_create_register(self, path: EPath) -> RegisterUnion:
-        ...
+    def _get_or_create_register(self, path: EPath) -> RegisterUnion: ...
 
     @overload
-    def _get_or_create_register(self, path: FEPath) -> FlatRegisterUnion:
-        ...
+    def _get_or_create_register(self, path: FEPath) -> FlatRegisterUnion: ...
 
     def _get_or_create_register(self, path: Any) -> Any:
         """
@@ -468,14 +464,12 @@ class Peripheral(Mapping[str, RegisterUnion]):
     @overload
     def _do_get_or_create_register(
         self, storage: Dict[EPath, RegisterUnion], path: EPath
-    ) -> RegisterUnion:
-        ...
+    ) -> RegisterUnion: ...
 
     @overload
     def _do_get_or_create_register(
         self, storage: Dict[FEPath, FlatRegisterUnion], path: FEPath
-    ) -> FlatRegisterUnion:
-        ...
+    ) -> FlatRegisterUnion: ...
 
     def _do_get_or_create_register(self, storage: Dict, path: Any) -> Any:
         try:
@@ -507,14 +501,12 @@ class Peripheral(Mapping[str, RegisterUnion]):
     @overload
     def _create_register(
         self, path: EPath, parent: Optional[RegisterUnion] = None
-    ) -> RegisterUnion:
-        ...
+    ) -> RegisterUnion: ...
 
     @overload
     def _create_register(
         self, path: FEPath, parent: Optional[FlatRegisterUnion] = None
-    ) -> FlatRegisterUnion:
-        ...
+    ) -> FlatRegisterUnion: ...
 
     def _create_register(
         self,
@@ -850,8 +842,7 @@ class _RegisterNode(ABC, Generic[_SpecT, EPathType]):
 
     @property
     @abstractmethod
-    def leaf(self) -> bool:
-        ...
+    def leaf(self) -> bool: ...
 
 
 class Array(_RegisterNode[_ArrayP, EPath], Sequence[ArrayMemberT]):
@@ -868,16 +859,13 @@ class Array(_RegisterNode[_ArrayP, EPath], Sequence[ArrayMemberT]):
     """
 
     @overload
-    def __getitem__(self, path: int, /) -> ArrayMemberT:
-        ...
+    def __getitem__(self, path: int, /) -> ArrayMemberT: ...
 
     @overload
-    def __getitem__(self, path: slice, /) -> Sequence[ArrayMemberT]:
-        ...
+    def __getitem__(self, path: slice, /) -> Sequence[ArrayMemberT]: ...
 
     @overload
-    def __getitem__(self, path: Sequence[Union[int, str]], /) -> ArrayMemberT:
-        ...
+    def __getitem__(self, path: Sequence[Union[int, str]], /) -> ArrayMemberT: ...
 
     def __getitem__(self, path: Any, /) -> Any:
         """Get the element at the given path."""
@@ -1421,8 +1409,7 @@ class Field(_Field):
         elif isinstance(new_content, str):
             if new_content not in self.enums:
                 raise ValueError(
-                    f"{self!r} does not accept"
-                    f" the enum '{new_content}'."
+                    f"{self!r} does not accept" f" the enum '{new_content}'."
                 )
             resolved_value = self.enums[new_content]
         else:
@@ -1608,6 +1595,13 @@ def _extract_register_descriptions_helper(
 
             size_bytes = reg_props.size // 8
 
+            if (
+                options.autocorrect_dim_increment
+                and dim_props is not None
+                and dim_props.step < size_bytes
+            ):
+                dim_props.step = size_bytes
+
             # Contiguous fill
             if dim_props is None or dim_props.step == size_bytes:
                 length = dim_props.length if dim_props is not None else 1
@@ -1674,11 +1668,14 @@ def _extract_register_descriptions_helper(
 
                 if dim_props is not None and dim_props.length > 1:
                     if dim_props.step < sub_max_address - address_start:
-                        raise SvdDefinitionError(
-                            element,
-                            f"Step of 0x{dim_props.step:x} is less than the size required to "
-                            f"cover all the child elements (0x{sub_max_address - address_start:x})",
-                        )
+                        if options.autocorrect_dim_increment:
+                            dim_props.step = sub_max_address - address_start
+                        else:
+                            raise SvdDefinitionError(
+                                element,
+                                f"Step of 0x{dim_props.step:x} is less than the size required to "
+                                f"cover all the child elements (0x{sub_max_address - address_start:x})",
+                            )
 
                     address_end = address_start + dim_props.step * dim_props.length
 
