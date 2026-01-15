@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Latest](https://github.com/NordicSemiconductor/svada)
 
+## [v2.2.1](https://github.com/NordicSemiconductor/svada/tree/v2.2.1)
+
+* Updated the lxml version requirement to be less strict.
+
 ## [v2.2.0](https://github.com/NordicSemiconductor/svada/tree/v2.2.0)
 
 ### Added
